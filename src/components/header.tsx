@@ -3,12 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const nav = [
-  { href: "#works", label: "Works" },
-  { href: "#about", label: "About" },
-  { href: "#contact", label: "Contact" },
-];
-
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
 
@@ -33,26 +27,12 @@ export function Header() {
           data-cursor="hover"
           className="text-sm font-medium tracking-tight text-[var(--color-fg-strong)]"
         >
-          Leejeongmin<span className="text-[var(--color-fg-subtle)]">/</span>
-          <span className="text-[var(--color-fg-muted)]">Portfolio</span>
+          Leejeongmin
         </Link>
-        <nav className="hidden items-center gap-1 md:flex">
-          {nav.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              data-cursor="hover"
-              className="group relative px-4 py-2 text-sm text-[var(--color-fg-muted)] transition-colors hover:text-[var(--color-fg-strong)]"
-            >
-              <span>{item.label}</span>
-              <span className="absolute inset-x-4 -bottom-px h-px origin-left scale-x-0 bg-[var(--color-fg-strong)] transition-transform duration-500 group-hover:scale-x-100" />
-            </a>
-          ))}
-        </nav>
         <a
           href="mailto:hello@leejeongmin.com"
           data-cursor="hover"
-          className="hidden text-sm text-[var(--color-fg-muted)] transition-colors hover:text-[var(--color-fg-strong)] md:inline"
+          className="text-sm text-[var(--color-fg-muted)] transition-colors hover:text-[var(--color-fg-strong)]"
         >
           hello@leejeongmin.com
         </a>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring } from "motion/react";
+import { useMediaQuery } from "@/lib/use-media-query";
 
 export function Cursor() {
   const x = useMotionValue(-100);
@@ -16,17 +17,8 @@ export function Cursor() {
     "default"
   );
   const [label, setLabel] = useState<string>("");
-  const [enabled, setEnabled] = useState(false);
+  const enabled = useMediaQuery("(hover: hover) and (pointer: fine)");
   const lastMove = useRef(0);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
-    setEnabled(fine.matches);
-    const handler = (e: MediaQueryListEvent) => setEnabled(e.matches);
-    fine.addEventListener("change", handler);
-    return () => fine.removeEventListener("change", handler);
-  }, []);
 
   useEffect(() => {
     if (!enabled) return;
