@@ -200,17 +200,23 @@ function ActiveLabel({ progress }: { progress: MotionValue<number> }) {
   return (
     <motion.div
       style={{ opacity }}
-      className="pointer-events-none absolute inset-x-0 bottom-12 z-40 flex justify-center"
+      className="pointer-events-none absolute inset-x-0 bottom-0 z-40"
     >
-      <motion.span
-        key={project.slug}
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-        className="font-display text-[clamp(28px,3.6vw,48px)] font-medium tracking-[-0.025em] text-[var(--color-fg)]"
-      >
-        {project.name}
-      </motion.span>
+      <div
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 h-[38vh] bg-gradient-to-t from-[var(--color-bg)] from-25% via-[var(--color-bg)]/80 via-60% to-transparent"
+      />
+      <div className="relative flex justify-center pb-12">
+        <motion.span
+          key={project.slug}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          className="font-display text-[clamp(28px,3.6vw,48px)] font-medium tracking-[-0.025em] text-[var(--color-fg)]"
+        >
+          {project.name}
+        </motion.span>
+      </div>
     </motion.div>
   );
 }
