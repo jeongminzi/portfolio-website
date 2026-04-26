@@ -144,3 +144,8 @@ export function getNextProject(slug: string): Project {
   const i = projects.findIndex((p) => p.slug === slug);
   return projects[(i + 1) % projects.length];
 }
+
+export function getPreviousProject(slug: string): Project {
+  const i = projects.findIndex((p) => p.slug === slug);
+  return projects[(i - 1 + projects.length) % projects.length];
+}

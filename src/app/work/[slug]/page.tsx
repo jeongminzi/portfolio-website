@@ -3,7 +3,12 @@ import { notFound } from "next/navigation";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { ProjectCanvas } from "@/components/project-canvas";
-import { getNextProject, getProject, projects } from "@/lib/projects";
+import {
+  getNextProject,
+  getPreviousProject,
+  getProject,
+  projects,
+} from "@/lib/projects";
 
 export function generateStaticParams() {
   return projects.map((p) => ({ slug: p.slug }));
@@ -32,6 +37,7 @@ export default async function WorkPage({
   const project = getProject(slug);
   if (!project) notFound();
   const next = getNextProject(slug);
+  const prev = getPreviousProject(slug);
 
   return (
     <>
@@ -77,17 +83,38 @@ export default async function WorkPage({
           </div>
         </section>
 
-        <section className="px-6 py-32 md:px-10 md:py-40">
+        <section className="border-t border-[var(--color-fg)] px-6 md:px-10">
           <div className="mx-auto max-w-[1440px]">
-            <Link
-              href={`/work/${next.slug}`}
-              data-cursor-label="Next"
-              className="block text-center"
-            >
-              <span className="font-display text-[clamp(48px,10vw,160px)] font-medium leading-[0.95] tracking-[-0.045em] text-[var(--color-fg)]">
-                {next.name}
-              </span>
-            </Link>
+            <ul>
+              <li className="border-b border-[var(--color-fg)]">
+                <Link
+                  href={`/work/${prev.slug}`}
+                  data-cursor-label="Prev"
+                  className="group grid grid-cols-12 items-center gap-4 py-8 transition-colors hover:bg-[var(--color-fg)] hover:text-[var(--color-bg)] md:py-12"
+                >
+                  <span className="col-span-4 text-xs uppercase tracking-[0.22em] opacity-60 md:col-span-3">
+                    ← Previous
+                  </span>
+                  <span className="col-span-8 text-right font-display text-[clamp(24px,4vw,56px)] font-medium leading-none tracking-[-0.03em] md:col-span-9">
+                    {prev.name}
+                  </span>
+                </Link>
+              </li>
+              <li className="border-b border-[var(--color-fg)]">
+                <Link
+                  href={`/work/${next.slug}`}
+                  data-cursor-label="Next"
+                  className="group grid grid-cols-12 items-center gap-4 py-8 transition-colors hover:bg-[var(--color-fg)] hover:text-[var(--color-bg)] md:py-12"
+                >
+                  <span className="col-span-4 text-xs uppercase tracking-[0.22em] opacity-60 md:col-span-3">
+                    Next →
+                  </span>
+                  <span className="col-span-8 text-right font-display text-[clamp(24px,4vw,56px)] font-medium leading-none tracking-[-0.03em] md:col-span-9">
+                    {next.name}
+                  </span>
+                </Link>
+              </li>
+            </ul>
           </div>
         </section>
 
