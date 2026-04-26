@@ -10,25 +10,56 @@ import {
 } from "motion/react";
 import { projects, type Project } from "@/lib/projects";
 import { useMediaQuery } from "@/lib/use-media-query";
-import { Icon } from "@/components/icon";
 
 const TOTAL = projects.length;
-const RADIUS = 300;
-const CARD_W = 220;
-const CARD_H = 290;
 
-const PHASE_ROTATE_END = 0.22;
-const PHASE_CONVERGE_END = 0.32;
-const SLOT_LENGTH = (1 - PHASE_CONVERGE_END) / TOTAL;
+// 디스플레이 비율
+const ORBIT_VMIN = 0.42;
+const BASE_VMIN = 0.09;
+const ACTIVE_VMIN = 0.7;
+
+// 진행도 단계
+const PHASE_1_END = 0.2;
+const PHASE_2_END = 0.32;
+const PHASE_3_RAMP = 0.06;
+
+function rotationFor(p: number) {
+  if (p < PHASE_2_END) {
+    return (p / PHASE_2_END) * 360;
+  }
+  return 360 + ((p - PHASE_2_END) / (1 - PHASE_2_END)) * 360;
+}
+
+function angleFor(p: number, i: number) {
+  const start = -90 + (i / TOTAL) * 360;
+  return start - rotationFor(p);
+}
+
+function rawActivity(angleDeg: number) {
+  const norm = (((angleDeg + 90) % 360) + 360) % 360;
+  const dist = Math.min(norm, 360 - norm) / 180;
+  return Math.max(0, 1 - dist * 4.5);
+}
+
+function phase3Mult(p: number) {
+  const t = (p - (PHASE_2_END - PHASE_3_RAMP)) / PHASE_3_RAMP;
+  return Math.max(0, Math.min(1, t));
+}
+
+function activityFor(p: number, i: number) {
+  return rawActivity(angleFor(p, i)) * phase3Mult(p);
+}
+
+function vmin() {
+  if (typeof window === "undefined") return 800;
+  return Math.min(window.innerWidth, window.innerHeight);
+}
 
 export function Works() {
   const isDesktop = useMediaQuery("(min-width: 768px)", true);
 
   return (
-    <section
-      id="works"
-      className="relative border-t border-[var(--color-line)]"
-    >
+    <section id="works" className="relative">
       {isDesktop ? <DesktopWorks /> : <MobileWorks />}
     </section>
   );
@@ -42,14 +73,12 @@ function DesktopWorks() {
   });
 
   return (
-    <div ref={ref} className="relative" style={{ height: "560vh" }}>
-      <div className="sticky top-0 h-screen overflow-hidden bg-[var(--color-bg)]">
-        <Chrome progress={scrollYProgress} />
-
+    <div ref={ref} className="relative" style={{ height: "650vh" }}>
+      <div className="sticky top-0 h-screen w-full overflow-hidden bg-[var(--color-bg)]">
+        <Intro progress={scrollYProgress} />
         <div className="absolute inset-0">
-          <CenterRing progress={scrollYProgress} />
           {projects.map((p, i) => (
-            <WorkCard
+            <Card
               key={p.slug}
               project={p}
               index={i}
@@ -57,58 +86,38 @@ function DesktopWorks() {
             />
           ))}
         </div>
-
         <ActiveLabel progress={scrollYProgress} />
       </div>
     </div>
   );
 }
 
-function Chrome({ progress }: { progress: MotionValue<number> }) {
-  const widthValue = useTransform(progress, [0, 1], ["0%", "100%"]);
-  return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 z-30 px-6 py-6 md:px-10">
-      <div className="mx-auto flex max-w-[1440px] items-center justify-between">
-        <div className="text-[11px] uppercase tracking-[0.22em] text-[var(--color-fg-muted)]">
-          Selected works
-        </div>
-        <div className="h-px w-32 bg-[var(--color-line)]">
-          <motion.div
-            style={{ width: widthValue }}
-            className="h-px bg-[var(--color-fg-strong)]"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CenterRing({ progress }: { progress: MotionValue<number> }) {
+function Intro({ progress }: { progress: MotionValue<number> }) {
   const opacity = useTransform(
     progress,
-    [0, PHASE_ROTATE_END, PHASE_CONVERGE_END],
-    [0.6, 0.6, 0]
+    [0, PHASE_1_END, PHASE_2_END],
+    [1, 1, 0]
   );
-  const rotate = useTransform(progress, [0, PHASE_ROTATE_END], [0, 90]);
-  const scale = useTransform(
+  const y = useTransform(
     progress,
-    [PHASE_ROTATE_END, PHASE_CONVERGE_END],
-    [1, 0.4]
+    [0, PHASE_1_END, PHASE_2_END],
+    [0, 0, 120]
   );
   return (
     <motion.div
-      style={{ opacity, rotate, scale }}
-      className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+      style={{ opacity, y }}
+      className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-6"
     >
-      <div
-        className="rounded-full border border-dashed border-[var(--color-line-strong)]"
-        style={{ width: RADIUS * 2, height: RADIUS * 2 }}
-      />
+      <p className="max-w-xl text-center text-[clamp(16px,1.6vw,20px)] leading-[1.55] text-[var(--color-fg)]">
+        A product designer crafting calm interfaces
+        <br />
+        for everyday tools.
+      </p>
     </motion.div>
   );
 }
 
-function WorkCard({
+function Card({
   project,
   index,
   progress,
@@ -117,161 +126,68 @@ function WorkCard({
   index: number;
   progress: MotionValue<number>;
 }) {
-  const slotCenter = PHASE_CONVERGE_END + (index + 0.5) * SLOT_LENGTH;
-  const startAngle = (index / TOTAL) * 360;
-
   const x = useTransform(progress, (p) => {
-    if (p >= PHASE_CONVERGE_END) return 0;
-    const rotProg = Math.min(p / PHASE_ROTATE_END, 1);
-    const angle = rotProg * 360 + startAngle;
-    const r =
-      p < PHASE_ROTATE_END
-        ? RADIUS
-        : RADIUS *
-          (1 -
-            (p - PHASE_ROTATE_END) /
-              (PHASE_CONVERGE_END - PHASE_ROTATE_END));
-    return Math.cos(((angle - 90) * Math.PI) / 180) * r;
+    const a = angleFor(p, index);
+    const eff = activityFor(p, index);
+    return Math.cos((a * Math.PI) / 180) * vmin() * ORBIT_VMIN * (1 - eff);
   });
-
   const y = useTransform(progress, (p) => {
-    if (p < PHASE_CONVERGE_END) {
-      const rotProg = Math.min(p / PHASE_ROTATE_END, 1);
-      const angle = rotProg * 360 + startAngle;
-      const r =
-        p < PHASE_ROTATE_END
-          ? RADIUS
-          : RADIUS *
-            (1 -
-              (p - PHASE_ROTATE_END) /
-                (PHASE_CONVERGE_END - PHASE_ROTATE_END));
-      return Math.sin(((angle - 90) * Math.PI) / 180) * r;
-    }
-    const dist = (p - slotCenter) / SLOT_LENGTH;
-    const vh = typeof window !== "undefined" ? window.innerHeight : 800;
-    return dist * vh * 0.95;
+    const a = angleFor(p, index);
+    const eff = activityFor(p, index);
+    return Math.sin((a * Math.PI) / 180) * vmin() * ORBIT_VMIN * (1 - eff);
   });
-
-  const scale = useTransform(progress, (p) => {
-    if (p < PHASE_CONVERGE_END) return 1;
-    const dist = Math.abs((p - slotCenter) / SLOT_LENGTH);
-    const peak = 2.6;
-    return Math.max(0.7, peak - dist * 0.9);
+  const size = useTransform(progress, (p) => {
+    const eff = activityFor(p, index);
+    return vmin() * (BASE_VMIN + (ACTIVE_VMIN - BASE_VMIN) * eff);
   });
-
   const opacity = useTransform(progress, (p) => {
-    if (p < PHASE_CONVERGE_END) {
-      const rotProg = Math.min(p / PHASE_ROTATE_END, 1);
-      const angle = (rotProg * 360 + startAngle) % 360;
-      const distFromTop = Math.min(angle, 360 - angle);
-      return Math.max(0.45, 1 - (distFromTop / 180) * 0.5);
-    }
-    const dist = Math.abs((p - slotCenter) / SLOT_LENGTH);
-    return Math.max(0, Math.min(1, 1.4 - dist * 1.3));
+    const eff = activityFor(p, index);
+    return 0.65 + eff * 0.35;
   });
-
-  const zIndex = useTransform(progress, (p) => {
-    if (p < PHASE_CONVERGE_END) return index + 1;
-    const dist = Math.abs((p - slotCenter) / SLOT_LENGTH);
-    return Math.round(100 - dist * 30);
-  });
-
-  const overlayOpacity = useTransform(progress, (p) => {
-    if (p < PHASE_CONVERGE_END) return 0;
-    const dist = Math.abs((p - slotCenter) / SLOT_LENGTH);
-    return Math.max(0, 1 - dist * 1.4);
-  });
+  const zIndex = useTransform(progress, (p) =>
+    Math.round(activityFor(p, index) * 100) + 1
+  );
 
   return (
     <motion.div
       style={{
         x,
         y,
-        scale,
+        width: size,
+        height: size,
         opacity,
         zIndex,
-        width: CARD_W,
-        height: CARD_H,
+        translateX: "-50%",
+        translateY: "-50%",
       }}
-      className="absolute left-1/2 top-1/2 -ml-[110px] -mt-[145px]"
+      className="absolute left-1/2 top-1/2"
     >
-      <motion.div
-        whileHover={{ y: -6 }}
-        transition={{ type: "spring", stiffness: 220, damping: 22 }}
-        className="relative h-full w-full"
-      >
-        <Link
-          href={`/work/${project.slug}`}
-          data-cursor-label="View"
-          className="relative block h-full w-full overflow-hidden rounded-sm border border-[var(--color-line-strong)] bg-[var(--color-bg-subtle)] shadow-[0_30px_60px_-30px_rgba(15,23,42,0.18)]"
-        >
-          <ProjectImage index={index} />
-          <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-3 text-[10px] uppercase tracking-[0.22em] text-[var(--color-fg-strong)]">
-            <span>{project.index}</span>
-          </div>
-          <motion.div
-            style={{ opacity: overlayOpacity }}
-            className="pointer-events-none absolute inset-x-0 bottom-0 border-t border-[var(--color-line)] bg-[var(--color-bg)]/95 p-4 backdrop-blur"
-          >
-            <div className="font-display text-base font-medium tracking-tight text-[var(--color-fg-strong)]">
-              {project.name}
-            </div>
-            <div className="mt-1 flex items-center justify-between text-[10px] uppercase tracking-[0.22em] text-[var(--color-fg-subtle)]">
-              <span>{project.category}</span>
-              <Icon
-                name="north_east"
-                className="text-[14px] text-[var(--color-fg-strong)]"
-              />
-            </div>
-          </motion.div>
-        </Link>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-function ProjectImage({ index }: { index: number }) {
-  const variants = [
-    "from-[#e4e4e7] via-[#d4d4d8] to-[#71717a]",
-    "from-[#f1f5f9] via-[#cbd5e1] to-[#475569]",
-    "from-[#f4f4f5] via-[#a1a1aa] to-[#52525b]",
-    "from-[#e2e8f0] via-[#94a3b8] to-[#334155]",
-  ];
-  return (
-    <div className={`absolute inset-0 bg-gradient-to-br ${variants[index]}`}>
-      <div
-        className="absolute inset-0 mix-blend-overlay"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), transparent 55%), radial-gradient(circle at 70% 75%, rgba(15,23,42,0.25), transparent 55%)",
-        }}
+      <Link
+        href={`/work/${project.slug}`}
+        data-cursor-label="View"
+        className="block h-full w-full rounded-full bg-[var(--color-fg)]"
       />
-    </div>
+    </motion.div>
   );
 }
 
 function ActiveLabel({ progress }: { progress: MotionValue<number> }) {
   const labelIndex = useTransform(progress, (p) => {
-    if (p < PHASE_CONVERGE_END) {
-      const rotProg = Math.min(p / PHASE_ROTATE_END, 1);
-      let best = 0;
-      let bestDist = Infinity;
-      for (let i = 0; i < TOTAL; i += 1) {
-        const angle = (rotProg * 360 + (i / TOTAL) * 360) % 360;
-        const dist = Math.min(angle, 360 - angle);
-        if (dist < bestDist) {
-          bestDist = dist;
-          best = i;
-        }
+    let best = 0;
+    let bestDist = Infinity;
+    for (let i = 0; i < TOTAL; i += 1) {
+      const a = angleFor(p, i);
+      const norm = (((a + 90) % 360) + 360) % 360;
+      const dist = Math.min(norm, 360 - norm);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = i;
       }
-      return best;
     }
-    const sub = Math.min(
-      Math.max((p - PHASE_CONVERGE_END) / (1 - PHASE_CONVERGE_END), 0),
-      0.999
-    );
-    return Math.floor(sub * TOTAL);
+    return best;
   });
+
+  const opacity = useTransform(progress, (p) => phase3Mult(p));
 
   const [idx, setIdx] = useState(0);
   useEffect(() => {
@@ -282,50 +198,33 @@ function ActiveLabel({ progress }: { progress: MotionValue<number> }) {
   const project = projects[idx] ?? projects[0];
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 border-t border-[var(--color-line)] bg-[var(--color-bg)]/85 px-6 py-5 backdrop-blur md:px-10">
-      <div className="mx-auto flex max-w-[1440px] items-baseline justify-between gap-6">
-        <div className="flex items-baseline gap-4">
-          <span className="text-[11px] tabular-nums text-[var(--color-fg-subtle)]">
-            {project.index} / {String(TOTAL).padStart(2, "0")}
-          </span>
-          <motion.span
-            key={project.slug}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="font-display text-2xl font-medium tracking-tight text-[var(--color-fg-strong)] md:text-3xl"
-          >
-            {project.name}
-          </motion.span>
-        </div>
-      </div>
-    </div>
+    <motion.div
+      style={{ opacity }}
+      className="pointer-events-none absolute inset-x-0 bottom-12 z-40 flex justify-center"
+    >
+      <motion.span
+        key={project.slug}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        className="font-display text-[clamp(28px,3.6vw,48px)] font-medium tracking-[-0.025em] text-[var(--color-fg)]"
+      >
+        {project.name}
+      </motion.span>
+    </motion.div>
   );
 }
 
 function MobileWorks() {
   return (
     <div className="px-6 py-20">
-      <ul className="space-y-6">
-        {projects.map((p, i) => (
+      <ul className="space-y-10">
+        {projects.map((p) => (
           <li key={p.slug}>
-            <Link
-              href={`/work/${p.slug}`}
-              className="block overflow-hidden rounded-sm border border-[var(--color-line-strong)] bg-[var(--color-bg-subtle)]"
-            >
-              <div className="relative h-48">
-                <ProjectImage index={i} />
-              </div>
-              <div className="border-t border-[var(--color-line)] bg-[var(--color-bg)] p-5">
-                <div className="text-[10px] uppercase tracking-[0.22em] text-[var(--color-fg-subtle)]">
-                  {p.index}
-                </div>
-                <div className="mt-2 font-display text-2xl font-medium tracking-tight text-[var(--color-fg-strong)]">
-                  {p.name}
-                </div>
-                <div className="mt-1 text-[11px] uppercase tracking-[0.22em] text-[var(--color-fg-muted)]">
-                  {p.category}
-                </div>
+            <Link href={`/work/${p.slug}`} className="block">
+              <div className="mx-auto aspect-square w-3/4 rounded-full bg-[var(--color-fg)]" />
+              <div className="mt-4 text-center font-display text-2xl font-medium tracking-tight text-[var(--color-fg)]">
+                {p.name}
               </div>
             </Link>
           </li>
