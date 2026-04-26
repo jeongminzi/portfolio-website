@@ -9,7 +9,6 @@ import {
   type MotionValue,
 } from "motion/react";
 import { projects, type Project } from "@/lib/projects";
-import { useMediaQuery } from "@/lib/use-media-query";
 
 const TOTAL = projects.length;
 
@@ -56,16 +55,6 @@ function vmin() {
 }
 
 export function Works() {
-  const isDesktop = useMediaQuery("(min-width: 768px)", true);
-
-  return (
-    <section id="works" className="relative">
-      {isDesktop ? <DesktopWorks /> : <MobileWorks />}
-    </section>
-  );
-}
-
-function DesktopWorks() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -73,8 +62,13 @@ function DesktopWorks() {
   });
 
   return (
-    <div ref={ref} className="relative" style={{ height: "650vh" }}>
-      <div className="sticky top-0 h-screen w-full overflow-hidden bg-[var(--color-bg)]">
+    <section
+      id="works"
+      ref={ref}
+      className="relative"
+      style={{ height: "650vh" }}
+    >
+      <div className="sticky top-0 h-[100svh] w-full overflow-hidden bg-[var(--color-bg)]">
         <Intro progress={scrollYProgress} />
         <div className="absolute inset-0">
           {projects.map((p, i) => (
@@ -88,7 +82,7 @@ function DesktopWorks() {
         </div>
         <ActiveLabel progress={scrollYProgress} />
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -221,21 +215,3 @@ function ActiveLabel({ progress }: { progress: MotionValue<number> }) {
   );
 }
 
-function MobileWorks() {
-  return (
-    <div className="px-6 py-20">
-      <ul className="space-y-10">
-        {projects.map((p) => (
-          <li key={p.slug}>
-            <Link href={`/work/${p.slug}`} className="block">
-              <div className="mx-auto aspect-square w-3/4 rounded-full bg-[var(--color-fg)]" />
-              <div className="mt-4 text-center font-display text-2xl font-medium tracking-tight text-[var(--color-fg)]">
-                {p.name}
-              </div>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
