@@ -111,6 +111,29 @@ export const projects: Project[] = [
       },
     ],
   },
+  {
+    slug: "ux-writing-plugin",
+    index: "05",
+    name: "UX Writing Plugin",
+    client: "Personal",
+    role: "Solo Designer & Developer",
+    year: "2025",
+    category: "Tool · Plugin",
+    summary:
+      "디자이너가 화면 안에서 바로 카피 톤을 점검할 수 있도록 만든 사이드 프로젝트.",
+    intro:
+      "디자인 파일과 실제 제품의 카피가 어긋나는 문제를 자주 마주쳤습니다. 디자이너가 화면 안에서 톤 가이드를 곁에 두고 작업할 수 있도록 작은 플러그인을 만들었습니다. 톤 일관성, 모호한 표현, 사용자 행동을 가리지 않는 라벨 등을 한 번에 점검합니다.",
+    sections: [
+      {
+        title: "Inline check",
+        body: "선택한 텍스트 레이어 옆에 결과를 즉시 띄워, 작업 흐름을 끊지 않고 카피 톤을 확인할 수 있도록 설계했습니다.",
+      },
+      {
+        title: "Custom rules",
+        body: "팀별 보이스 가이드를 룰셋으로 등록할 수 있도록 구조를 열어, 조직마다 다른 톤 기준을 그대로 반영합니다.",
+      },
+    ],
+  },
 ];
 
 export function getProject(slug: string): Project | undefined {
