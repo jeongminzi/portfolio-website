@@ -23,10 +23,11 @@ const SIDE_PADDING = 24;
 const BREAK_LARGE = 1280;
 const BREAK_SMALL = 1024;
 
-function computeDockX(w: number) {
-  const dockW = DOCK_WIDTH_ESTIMATE;
-  const centerX = w / 2 - dockW / 2;
-  const rightX = w - dockW - SIDE_PADDING;
+// dock 은 항상 우측 부착(right: SIDE_PADDING). 좌측으로 얼마나 밀어줄지(x 음수)만
+// viewport 폭에 따라 보간한다. x=0 → 우측 부착, x=음수 → 가운데.
+function computeOffsetX(w: number) {
+  const rightX = 0;
+  const centerX = -(w / 2 - DOCK_WIDTH_ESTIMATE / 2 - SIDE_PADDING);
 
   if (w >= BREAK_LARGE) return centerX;
   if (w <= BREAK_SMALL) return rightX;
@@ -39,7 +40,7 @@ export function Header() {
   const [x, setX] = useState<number | null>(null);
 
   useLayoutEffect(() => {
-    const update = () => setX(computeDockX(window.innerWidth));
+    const update = () => setX(computeOffsetX(window.innerWidth));
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
@@ -57,10 +58,16 @@ export function Header() {
         </Link>
         {x !== null ? (
           <motion.div
-            initial={{ x }}
-            animate={{ x }}
-            transition={{ type: "spring", stiffness: 110, damping: 22, mass: 0.8 }}
-            className="pointer-events-auto absolute left-0 top-1/2 -translate-y-1/2 w-fit"
+            initial={{ x, y: "-50%" }}
+            animate={{ x, y: "-50%" }}
+            transition={{
+              type: "spring",
+              stiffness: 110,
+              damping: 22,
+              mass: 0.8,
+            }}
+            style={{ right: SIDE_PADDING, top: "50%" }}
+            className="pointer-events-auto absolute"
           >
             <FloatingDock items={items} />
           </motion.div>
