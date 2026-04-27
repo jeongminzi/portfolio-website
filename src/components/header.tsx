@@ -25,7 +25,7 @@ export function Header() {
         >
           Leejeongmin
         </Link>
-        <div className="pointer-events-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div className="pointer-events-auto absolute right-6 top-1/2 -translate-y-1/2 md:right-10 lg:left-1/2 lg:right-auto lg:-translate-x-1/2">
           <FloatingDock items={items} />
         </div>
       </div>
