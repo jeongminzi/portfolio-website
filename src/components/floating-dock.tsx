@@ -122,7 +122,7 @@ function DockTile({
   return (
     <motion.div
       style={{ width, height: width }}
-      className="relative flex aspect-square items-center justify-center rounded-full text-[var(--color-fg)]/45 transition-colors duration-200 group-hover:text-[var(--color-fg)]"
+      className="relative flex aspect-square items-center justify-center rounded-full text-[var(--color-fg)]/70 transition-colors duration-200 group-hover:text-[var(--color-fg)]"
     >
       <motion.span style={{ fontSize: iconSize }} className="leading-none">
         <Icon name={item.icon} weight={400} />
