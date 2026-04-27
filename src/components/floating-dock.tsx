@@ -24,7 +24,7 @@ const ICON_PEAK = 56;
 const FONT_BASE = 18;
 const FONT_PEAK = 28;
 const MAGNIFY_RANGE = 150;
-const LABEL_GAP = 6;
+const LABEL_GAP = 14;
 const LABEL_HEIGHT = 28;
 
 export function FloatingDock({ items }: { items: DockItem[] }) {
@@ -156,11 +156,11 @@ function GooeyFilter() {
     >
       <defs>
         <filter id="dock-goo">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
+          <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="blur" />
           <feColorMatrix
             in="blur"
             type="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9"
             result="goo"
           />
           <feComposite in="SourceGraphic" in2="goo" operator="atop" />
