@@ -60,8 +60,7 @@ export function Header() {
             initial={{ x }}
             animate={{ x }}
             transition={{ type: "spring", stiffness: 110, damping: 22, mass: 0.8 }}
-            style={{ width: DOCK_WIDTH_ESTIMATE }}
-            className="pointer-events-auto absolute left-0 top-1/2 -translate-y-1/2"
+            className="pointer-events-auto absolute left-0 top-1/2 -translate-y-1/2 w-fit"
           >
             <FloatingDock items={items} />
           </motion.div>
