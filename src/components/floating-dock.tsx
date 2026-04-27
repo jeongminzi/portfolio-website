@@ -17,6 +17,13 @@ export type DockItem = {
   href: string;
 };
 
+const DOCK_HEIGHT = 64;
+const ICON_BASE = 32;
+const ICON_PEAK = 56;
+const FONT_BASE = 18;
+const FONT_PEAK = 28;
+const MAGNIFY_RANGE = 150;
+
 export function FloatingDock({ items }: { items: DockItem[] }) {
   const mouseX = useMotionValue<number>(Infinity);
 
@@ -24,7 +31,8 @@ export function FloatingDock({ items }: { items: DockItem[] }) {
     <motion.div
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
-      className="mx-auto flex h-14 items-end gap-2 rounded-full border border-[var(--color-fg)] bg-[var(--color-bg)]/85 px-3 pb-3 pt-3 backdrop-blur"
+      style={{ height: DOCK_HEIGHT }}
+      className="mx-auto flex items-center gap-3 rounded-full border border-[var(--color-fg)]/15 bg-[var(--color-bg)]/80 px-4 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.18)] backdrop-blur-md"
     >
       {items.map((item) => (
         <DockIcon key={item.href} item={item} mouseX={mouseX} />
@@ -50,21 +58,30 @@ function DockIcon({
     return val - bounds.x - bounds.width / 2;
   });
 
-  const widthSync = useTransform(distance, [-150, 0, 150], [36, 72, 36]);
+  const widthSync = useTransform(
+    distance,
+    [-MAGNIFY_RANGE, 0, MAGNIFY_RANGE],
+    [ICON_BASE, ICON_PEAK, ICON_BASE]
+  );
   const width = useSpring(widthSync, {
     mass: 0.1,
     stiffness: 150,
     damping: 12,
   });
 
-  const iconSync = useTransform(distance, [-150, 0, 150], [16, 30, 16]);
+  const iconSync = useTransform(
+    distance,
+    [-MAGNIFY_RANGE, 0, MAGNIFY_RANGE],
+    [FONT_BASE, FONT_PEAK, FONT_BASE]
+  );
   const iconSize = useSpring(iconSync, {
     mass: 0.1,
     stiffness: 150,
     damping: 12,
   });
 
-  const isExternal = item.href.startsWith("mailto:") || item.href.startsWith("http");
+  const isExternal =
+    item.href.startsWith("mailto:") || item.href.startsWith("http");
 
   if (isExternal) {
     return (
@@ -105,12 +122,12 @@ function DockTile({
   return (
     <motion.div
       style={{ width, height: width }}
-      className="relative flex aspect-square items-center justify-center rounded-full text-[var(--color-fg)] transition-colors group-hover:bg-[var(--color-fg)] group-hover:text-[var(--color-bg)]"
+      className="relative flex aspect-square items-center justify-center rounded-full text-[var(--color-fg)]"
     >
       <motion.span style={{ fontSize: iconSize }} className="leading-none">
         <Icon name={item.icon} weight={500} />
       </motion.span>
-      <span className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-[var(--color-fg)] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[var(--color-bg)] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+      <span className="pointer-events-none absolute left-1/2 top-full mt-3 -translate-x-1/2 whitespace-nowrap rounded-md bg-[var(--color-fg)] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[var(--color-bg)] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
         {item.title}
       </span>
     </motion.div>

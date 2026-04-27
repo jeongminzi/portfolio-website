@@ -11,12 +11,12 @@ const items: DockItem[] = [
 
 export function Header() {
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-50">
-      <div className="relative mx-auto h-20 max-w-[1440px] px-6 md:px-10">
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-50 pt-6">
+      <div className="relative mx-auto flex h-16 max-w-[1440px] items-center px-6 md:px-10">
         <Link
           href="/"
           data-cursor="hover"
-          className="pointer-events-auto absolute left-6 top-1/2 -translate-y-1/2 font-display text-base font-semibold tracking-tight text-[var(--color-fg)] md:left-10"
+          className="pointer-events-auto font-display text-base font-semibold tracking-tight text-[var(--color-fg)]"
         >
           Leejeongmin
         </Link>
