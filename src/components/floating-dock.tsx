@@ -32,7 +32,7 @@ export function FloatingDock({ items }: { items: DockItem[] }) {
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
       style={{ height: DOCK_HEIGHT }}
-      className="mx-auto flex items-center gap-3 rounded-full bg-[var(--color-bg)]/85 px-4 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.18)] backdrop-blur-md"
+      className="inline-flex w-fit items-center gap-3 rounded-full bg-[var(--color-bg)]/85 px-4 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.18)] backdrop-blur-md"
     >
       {items.map((item) => (
         <DockIcon key={item.href} item={item} mouseX={mouseX} />
