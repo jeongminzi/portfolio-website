@@ -18,10 +18,10 @@ const items: DockItem[] = [
   { title: "Contact", Icon: MailSharp, href: "mailto:hello@leejeongmin.com" },
 ];
 
-const DOCK_WIDTH_ESTIMATE = 280;
+const DOCK_WIDTH_ESTIMATE = 240;
 const SIDE_PADDING = 24;
-const BREAK_LARGE = 1180;
-const BREAK_SMALL = 720;
+const BREAK_LARGE = 1280;
+const BREAK_SMALL = 1024;
 
 function computeDockX(w: number) {
   const dockW = DOCK_WIDTH_ESTIMATE;
