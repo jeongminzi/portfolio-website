@@ -24,10 +24,6 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
         />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,300..700,0..1,-50..200&display=swap"
-        />
       </head>
       <body className="no-cursor min-h-full bg-[var(--color-bg)] text-[var(--color-fg)]">
         <Cursor />

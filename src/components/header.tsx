@@ -1,12 +1,17 @@
 import Link from "next/link";
+import HomeSharp from "@mui/icons-material/HomeSharp";
+import AppsSharp from "@mui/icons-material/AppsSharp";
+import PersonSharp from "@mui/icons-material/PersonSharp";
+import EmojiEventsSharp from "@mui/icons-material/EmojiEventsSharp";
+import MailSharp from "@mui/icons-material/MailSharp";
 import { FloatingDock, type DockItem } from "@/components/floating-dock";
 
 const items: DockItem[] = [
-  { title: "Home", icon: "home", href: "/" },
-  { title: "Project", icon: "grid_view", href: "/#works" },
-  { title: "About", icon: "person", href: "/about" },
-  { title: "Achievement", icon: "emoji_events", href: "/achievement" },
-  { title: "Contact", icon: "mail", href: "mailto:hello@leejeongmin.com" },
+  { title: "Home", Icon: HomeSharp, href: "/" },
+  { title: "Project", Icon: AppsSharp, href: "/#works" },
+  { title: "About", Icon: PersonSharp, href: "/about" },
+  { title: "Achievement", Icon: EmojiEventsSharp, href: "/achievement" },
+  { title: "Contact", Icon: MailSharp, href: "mailto:hello@leejeongmin.com" },
 ];
 
 export function Header() {

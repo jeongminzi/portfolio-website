@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, type ComponentType } from "react";
 import {
   motion,
   useMotionValue,
@@ -9,11 +9,11 @@ import {
   useTransform,
   type MotionValue,
 } from "motion/react";
-import { Icon } from "@/components/icon";
+import type { SvgIconProps } from "@mui/material/SvgIcon";
 
 export type DockItem = {
   title: string;
-  icon: string;
+  Icon: ComponentType<SvgIconProps>;
   href: string;
 };
 
@@ -119,13 +119,17 @@ function DockTile({
   iconSize: MotionValue<number>;
   item: DockItem;
 }) {
+  const Icon = item.Icon;
   return (
     <motion.div
       style={{ width, height: width }}
       className="relative flex aspect-square items-center justify-center rounded-full text-[var(--color-fg)]/70 transition-colors duration-200 group-hover:text-[var(--color-fg)]"
     >
-      <motion.span style={{ fontSize: iconSize }} className="leading-none">
-        <Icon name={item.icon} weight={400} />
+      <motion.span
+        style={{ fontSize: iconSize }}
+        className="flex leading-none"
+      >
+        <Icon fontSize="inherit" />
       </motion.span>
       <span className="pointer-events-none absolute left-1/2 top-full mt-3 -translate-x-1/2 whitespace-nowrap rounded-md bg-[var(--color-fg)] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[var(--color-bg)] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
         {item.title}
