@@ -9,7 +9,7 @@ export function Icon({ name, className, weight = 400, fill = 0 }: IconProps) {
   return (
     <span
       aria-hidden
-      className={`material-symbols-rounded ${className ?? ""}`}
+      className={`material-symbols-sharp ${className ?? ""}`}
       style={{
         fontVariationSettings: `"FILL" ${fill}, "wght" ${weight}, "GRAD" 0, "opsz" 24`,
       }}

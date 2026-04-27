@@ -32,7 +32,7 @@ export function FloatingDock({ items }: { items: DockItem[] }) {
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
       style={{ height: DOCK_HEIGHT }}
-      className="mx-auto flex items-center gap-3 rounded-full border border-[var(--color-fg)]/15 bg-[var(--color-bg)]/80 px-4 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.18)] backdrop-blur-md"
+      className="mx-auto flex items-center gap-3 rounded-full bg-[var(--color-bg)]/85 px-4 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.18)] backdrop-blur-md"
     >
       {items.map((item) => (
         <DockIcon key={item.href} item={item} mouseX={mouseX} />
@@ -122,10 +122,10 @@ function DockTile({
   return (
     <motion.div
       style={{ width, height: width }}
-      className="relative flex aspect-square items-center justify-center rounded-full text-[var(--color-fg)]"
+      className="relative flex aspect-square items-center justify-center rounded-full text-[var(--color-fg)]/45 transition-colors duration-200 group-hover:text-[var(--color-fg)]"
     >
       <motion.span style={{ fontSize: iconSize }} className="leading-none">
-        <Icon name={item.icon} weight={500} />
+        <Icon name={item.icon} weight={400} />
       </motion.span>
       <span className="pointer-events-none absolute left-1/2 top-full mt-3 -translate-x-1/2 whitespace-nowrap rounded-md bg-[var(--color-fg)] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[var(--color-bg)] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
         {item.title}
