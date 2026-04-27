@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useLayoutEffect, useState } from "react";
+import { motion } from "motion/react";
 import HomeSharp from "@mui/icons-material/HomeSharp";
 import AppsSharp from "@mui/icons-material/AppsSharp";
 import PersonSharp from "@mui/icons-material/PersonSharp";
@@ -14,20 +18,54 @@ const items: DockItem[] = [
   { title: "Contact", Icon: MailSharp, href: "mailto:hello@leejeongmin.com" },
 ];
 
+const DOCK_WIDTH_ESTIMATE = 280;
+const SIDE_PADDING = 24;
+const BREAK_LARGE = 1180;
+const BREAK_SMALL = 720;
+
+function computeDockX(w: number) {
+  const dockW = DOCK_WIDTH_ESTIMATE;
+  const centerX = w / 2 - dockW / 2;
+  const rightX = w - dockW - SIDE_PADDING;
+
+  if (w >= BREAK_LARGE) return centerX;
+  if (w <= BREAK_SMALL) return rightX;
+
+  const t = (BREAK_LARGE - w) / (BREAK_LARGE - BREAK_SMALL);
+  return centerX + (rightX - centerX) * t;
+}
+
 export function Header() {
+  const [x, setX] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    const update = () => setX(computeDockX(window.innerWidth));
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50 pt-6">
-      <div className="relative mx-auto flex h-16 max-w-[1440px] items-center px-6 md:px-10">
+      <div className="relative h-16">
         <Link
           href="/"
           data-cursor="hover"
-          className="pointer-events-auto font-display text-base font-semibold tracking-tight text-[var(--color-fg)]"
+          className="pointer-events-auto absolute left-6 top-1/2 -translate-y-1/2 font-display text-base font-semibold tracking-tight text-[var(--color-fg)] md:left-10"
         >
           Leejeongmin
         </Link>
-        <div className="pointer-events-auto absolute right-6 top-1/2 -translate-y-1/2 md:right-10 lg:left-1/2 lg:right-auto lg:-translate-x-1/2">
-          <FloatingDock items={items} />
-        </div>
+        {x !== null ? (
+          <motion.div
+            initial={{ x }}
+            animate={{ x }}
+            transition={{ type: "spring", stiffness: 110, damping: 22, mass: 0.8 }}
+            style={{ width: DOCK_WIDTH_ESTIMATE }}
+            className="pointer-events-auto absolute left-0 top-1/2 -translate-y-1/2"
+          >
+            <FloatingDock items={items} />
+          </motion.div>
+        ) : null}
       </div>
     </header>
   );
